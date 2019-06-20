@@ -45,14 +45,15 @@ declare class Agent implements Taggable, StartSpanFn {
   startTransaction (
     name?: string,
     type?: string,
-    options?: TransactionOptions
+    options?: TransactionOptions,
+    outerContext?: any
   ): Transaction | null;
   setTransactionName (name: string): void;
   endTransaction (result?: string | number, endTime?: number): void;
   currentTransaction: Transaction | null;
 
   // Spans
-  startSpan (name?: string, type?: string, options?: SpanOptions): Span | null;
+  startSpan (name?: string, type?: string, options?: SpanOptions, outerContext?: any): Span | null;
   currentSpan: Span | null;
 
   // Context
@@ -81,6 +82,7 @@ declare class GenericSpan implements Taggable {
 
   type: string;
   traceparent: string;
+  outerContext: any;
 
   setLabel (name: string, value: LabelValue): boolean;
   setTag (name: string, value: LabelValue): boolean; // Deprecated
@@ -95,7 +97,7 @@ declare class Transaction extends GenericSpan implements StartSpanFn {
   name: string;
   result: string | number;
 
-  startSpan (name?: string, type?: string, options?: SpanOptions): Span | null;
+  startSpan (name?: string, type?: string, options?: SpanOptions, outerContext?: any): Span | null;
   ensureParentId (): string;
   end (result?: string | number | null, endTime?: number): void;
 }
@@ -106,6 +108,7 @@ declare class Span extends GenericSpan {
 
   transaction: Transaction;
   name: string;
+  outerContext: any;
 
   end (endTime?: number): void;
 }
@@ -236,7 +239,7 @@ interface Taggable {
 }
 
 interface StartSpanFn {
-  startSpan (name?: string, type?: string, options?: SpanOptions): Span | null;
+  startSpan (name?: string, type?: string, options?: SpanOptions, outerContext?: any): Span | null;
 }
 
 // Inlined from @types/aws-lambda - start
